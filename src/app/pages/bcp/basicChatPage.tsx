@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { initConfig } from "../logic/initConfig";
+import { initConfig } from "../../logic/initConfig";
 
 initConfig();
 
