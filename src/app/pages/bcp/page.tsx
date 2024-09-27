@@ -1,32 +1,41 @@
+'use client'
+import {useState } from "react";
 import { initConfig } from "../../logic/initConfig";
+import { sendDB } from "@/app/logic/db_status";
 
 initConfig();
 
 export default function BasicChat() {
+  const [inputVal,setVal] = useState<string>('');
     return (
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          <div className="flex gap-4 items-center flex-col">
-            <h1>Basic Chat Room</h1>
-            <a
-              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Basic Chat Start
-            </a>
-            <a
-              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Private Chat Start
-            </a>
-          </div>
-        </main>
+      <>
+      <div className="flex flex-col h-full p-4">
+       <div className="flex-1 overflow-y-auto bg-gray-100 rounded-lg p-4 mb-4 shadow-md">
+         <div className="flex flex-col gap-2">
+           {/* ここをいい感じの領域にする必要がある */}
+           <div className="bg-white rounded-lg p-2">User1: Hello!</div>
+           <div className="bg-white rounded-lg p-2">User2: Hi there!</div>
+         </div>
+       </div>
       </div>
+      <div className="flex">
+       <input
+        type="text"
+        value={inputVal}
+        onChange={(e) => setVal(e.target.value)}
+        className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
+        placeholder="Type your message..."
+       />
+       <button
+       onClick={()=>{
+        sendDB(inputVal);
+       }}
+        name="Send"
+        className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition">
+          send
+       </button>
+      </div>
+      </>
     );
   }
   

@@ -2,13 +2,12 @@ import { set,get,push, onValue, ref } from "firebase/database";
 import { initConfig,initApp } from "./initConfig";
 
 initConfig();
-export const sendDB = (user:string,msg:string) =>{
+export const sendDB = (msg:string) =>{
     const msgRef = dbRef('msg');
     const newMsgRef = push(msgRef);
 
     //メッセージをDBに送信する処理を入れる
     set(newMsgRef,{
-        user:user,
         msg:msg,
         timestamp:Date.now()
     }).then(() => {
