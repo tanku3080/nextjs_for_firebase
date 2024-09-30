@@ -1,4 +1,4 @@
-import { onChildAdded,push,ref, Unsubscribe } from "firebase/database";
+import { onChildAdded,onValue,push,ref, Unsubscribe } from "firebase/database";
 import {initApp } from "./initConfig";
 
 export const sendDB = async(msg:string) =>{
@@ -16,9 +16,27 @@ export const sendDB = async(msg:string) =>{
     })
 }
 
+type msgData ={
+    msg:string;
+    timestamp:string;
+}
 //ここが鬼門で、値を取得した結果をどうやってoage.tsxにもっていくか？悩んでいる
 export const getDB = ():Unsubscribe =>{  
     const msgRef = dbRef('msg');
+    onValue(msgRef,(ss) => {
+        const dt = ss.val();
+        if (dt) {
+            const msgArray = Object.entries(dt).map(([key,value]) =>{
+                const message = value as msgData;
+                return{
+                    id:key,
+                    msg:message.msg,
+                    timestamp:message
+                }
+            });
+            console.log("あたい:\n",msgArray);
+        }
+    })
     return onChildAdded(msgRef,(ss) =>{
         const val = ss.val();
         console.log(val);
