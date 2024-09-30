@@ -1,4 +1,4 @@
-import { get,push, onValue, ref, onChildAdded } from "firebase/database";
+import { onChildAdded,push,ref, Unsubscribe } from "firebase/database";
 import {initApp } from "./initConfig";
 
 export const sendDB = async(msg:string) =>{
@@ -16,29 +16,13 @@ export const sendDB = async(msg:string) =>{
     })
 }
 
-export const getDB = () =>{
+//ここが鬼門で、値を取得した結果をどうやってoage.tsxにもっていくか？悩んでいる
+export const getDB = ():Unsubscribe =>{  
     const msgRef = dbRef('msg');
-    const msgGet = get(msgRef);
-    // return onChildAdded(msgRef,(snapShot)=>{
-    //     const val = snapShot.val().toISOString();
-    //     const red = val;
-    //     console.log("値確認:/n",red);
-    // })
-    // onValue(msgRef,(snapShot) => {
-    //     console.log("監視");
-    //     const data = snapShot.val();
-    //     console.log(data);
-    //     if (data) {
-    //         const array = Object.values(data);
-    //         console.log("内容物確認\n",array);
-    //         get(data).then(() =>{
-    //             console.log("getした");
-    //         }).catch((e) =>{
-    //             console.log("無理だ\n",e);
-    //         })
-    //     }
-    //     return data
-    // })
+    return onChildAdded(msgRef,(ss) =>{
+        const val = ss.val();
+        console.log(val);
+    })
 }
 
 /**

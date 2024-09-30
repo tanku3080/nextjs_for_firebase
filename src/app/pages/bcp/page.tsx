@@ -1,12 +1,10 @@
 'use client'
 import {useState } from "react";
 import chatLogLayout from "@/app/mod/chatLogLayout";
-import { sendDB,getDB } from "@/app/logic/db_status";
+import { sendDB } from "@/app/logic/db_status";
 
 export default function BasicChat() {
   const [inputVal,setVal] = useState<string>('');
-  const test = getDB();
-  console.log(test)
     return (
       <>
       {chatLogLayout()}
