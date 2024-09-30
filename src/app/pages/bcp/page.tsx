@@ -14,15 +14,16 @@ export default function BasicChat() {
         value={inputVal}
         onChange={(e) => setVal(e.target.value)}
         className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
-        placeholder="Type your message..."
+        placeholder="メッセージを入力"
        />
        <button
        onClick={()=>{
         sendDB(inputVal);
+        setVal("");
        }}
         name="Send"
         className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition">
-          send
+          送信
        </button>
       </div>
       </>
