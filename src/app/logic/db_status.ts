@@ -1,20 +1,13 @@
-import {
-  onChildAdded,
-  onValue,
-  push,
-  ref,
-  Unsubscribe,
-} from "firebase/database";
+import { get, push, ref, set } from "firebase/database";
 import { initApp } from "./initConfig";
 
 export const sendDB = async (msg: string) => {
-  const msgRef = dbRef("msg");
-  const newMsgRef = push(msgRef);
   const otherIDRes = await IpAddressGet();
+  const msgRef = dbRef(otherIDRes);
+  const newMsgRef = push(msgRef);
   //メッセージをDBに送信する処理を入れる
-  await push(newMsgRef, {
+  await set(newMsgRef, {
     msg: msg,
-    otherID: otherIDRes,
     timestamp: nowData(),
   })
     .then(() => {
@@ -24,37 +17,49 @@ export const sendDB = async (msg: string) => {
       console.log("message error\n", e);
     });
 };
-
-type msgData = {
-  msg: string;
-  timestamp: string;
-};
 //ここが鬼門で、値を取得した結果をどうやってoage.tsxにもっていくか？悩んでいる
-export const getDB = (): Unsubscribe => {
-  const msgRef = dbRef("msg");
-  onValue(msgRef, (ss) => {
-    const dt = ss.val();
-    if (dt) {
-      const msgArray = Object.entries(dt).map(([key, value]) => {
-        const message = value as msgData;
-        return {
-          id: key,
-          msg: message.msg,
-          timestamp: message,
-        };
-      });
-      console.log("あたい:\n", msgArray);
+export const getDB = async () => {
+  const uniqueID = await IpAddressGet();
+  const dbref = ref(initApp);
+  try {
+    const ss = await get(dbref);
+    if (ss.exists()) {
+      const userDb = ss.val();
+      const userKeys = Object.keys(userDb);
+      console.log("ユーザー数:", userKeys.length);
+
+      //ユーザー識別
+      const msg = [];
+      for (const userKey of userKeys) {
+        const userMsg = userDb[userKey];
+
+        const UserOrOther = userKey === uniqueID ? "自分" : "自分以外";
+
+        //timestamp比較
+        for (const msgKey in userMsg) {
+          const msgDt = userMsg[msgKey];
+          msg.push({
+            sender: UserOrOther,
+            msg: msgDt.msg,
+            timestamp: msgDt.timestamp,
+          });
+        }
+      }
+      msg.sort((a, b) => compareTimestamps(a.timestamp, b.timestamp));
+      return msg;
+    } else {
+      console.log("No Data");
+      return [];
     }
-  });
-  return onChildAdded(msgRef, (ss) => {
-    const val = ss.val();
-    console.log(val);
-  });
+  } catch (e) {
+    console.error("エラー発生:\n", e);
+  }
 };
 
 /**
  * データパスを参照するための処理
  * @param input データ取得に用いるキー
+ * @param uniqueID ユーザー識別用のidをセットする
  * @returns
  */
 export const dbRef = (input: string) => {
@@ -71,6 +76,25 @@ const nowData = () => {
   dt.setTime(dt.getTime() + 9 * 60 * 60 * 1000);
   const dtString = dt.toISOString().replace("T", " ").substring(0, 19);
   return dtString;
+};
+
+/**
+ * 取得したtimestampを良い感じに成型する
+ * @param a 比較元
+ * @param b 比較先
+ * @returns
+ */
+export const compareTimestamps = (a: string, b: string) => {
+  // "2024-10-03 18:37:47" を "2024-10-03T18:37:47" に変換
+  const formatTimestamp = (timestamp: string) => {
+    return timestamp.replace(" ", "T");
+  };
+
+  // タイムスタンプをDateオブジェクトに変換
+  const dateA = new Date(formatTimestamp(a));
+  const dateB = new Date(formatTimestamp(b));
+
+  return dateA.getTime() - dateB.getTime();
 };
 
 /**

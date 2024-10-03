@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
 import { sendDB } from "@/app/logic/db_status";
-import chatLogLayout from "@/app/mod/chatLogLayout";
+import ChatLogLayout from "@/app/mod/chatLogLayout";
 
 export default function BasicChat() {
   const [inputVal, setVal] = useState<string>("");
-  chatLogLayout();
+  ChatLogLayout();
   return (
     <>
       <div className="flex">
