@@ -10,7 +10,7 @@ import { initApp } from "./initConfig";
 export const sendDB = async (msg: string) => {
   const msgRef = dbRef("msg");
   const newMsgRef = push(msgRef);
-  const otherIDRes = "pt1";
+  const otherIDRes = await IpAddressGet();
   //メッセージをDBに送信する処理を入れる
   await push(newMsgRef, {
     msg: msg,
@@ -71,4 +71,14 @@ const nowData = () => {
   dt.setTime(dt.getTime() + 9 * 60 * 60 * 1000);
   const dtString = dt.toISOString().replace("T", " ").substring(0, 19);
   return dtString;
+};
+
+/**
+ * 個人を識別する為、ip addressをユニークキーとして使用
+ * @returns
+ */
+const IpAddressGet = async () => {
+  const res = await fetch("https://ipapi.co/json/");
+  const dt = await res.json();
+  return dt.ip;
 };
